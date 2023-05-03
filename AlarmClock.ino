@@ -4,72 +4,26 @@
 // include the library code:
 #include <LiquidCrystal.h>
 
-#define SIZE 15
+#define ARR_SIZE 15
 #define LOOP_SIZE 20
 
 // initialize the library by associating any needed LCD interface pin
 // with the arduino pin number it is connected to
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
-char date[SIZE] = __DATE__;
-char time_at_upload = __TIME__;
-char myDate[3][SIZE]; 
+char startDate[ARR_SIZE] = __DATE__;
+char startTime[ARR_SIZE] = __TIME__;
+char myDate[3][ARR_SIZE];
+char myTime[3][ARR_SIZE];
 char prev_char;
-
-String print_0;
-String print_1;
 
 void setup() {
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   Serial.begin(9600);
 
-  Serial.println("====================================================");
-  Serial.println(date[SIZE] == NULL);
-
-
-  //Store date at Arduino upload
-  int i = 0;
-  int count = 0;
-  for (int j = 0; j < LOOP_SIZE; j++)
-  {
-    Serial.print("char = ");
-    Serial.println(date[j]);
-    Serial.print("isNull = ");
-    Serial.println(date[j] == NULL);
-    Serial.print("j = ");
-    Serial.println(j);
-    Serial.print("i = ");
-    Serial.println(i);
-    Serial.print("count = ");
-    Serial.println(count);
-    Serial.print("my monitor = ");
-    Serial.println(myDate[i]);
-    Serial.println("-------");
-    
-    if (i==3)
-    {
-      Serial.println("BREAK!");
-      break;
-    }
-    
-    if (date[j] != ' ' && date[j] != NULL) 
-    {
-      myDate[i][count] = date[j];
-      count++;
-    }
-    
-    if ((date[j] == ' ' || date[j] == NULL) && (prev_char != ' ' && prev_char != NULL))
-    {
-      i++;
-      count = 0;
-    }
-    
-    prev_char = date[j];
-    
-  }
-
-  Serial.println(__TIME__);
+  parse_startDate();
+  parse_startTime();
 }
 
 void loop() {
@@ -83,7 +37,68 @@ void loop() {
   lcd.print(myDate[2]);
   lcd.print(" ");
   lcd.setCursor(0, 1);
-  lcd.print(__TIME__);
+  lcd.print(myTime[0]);
+  lcd.print("h");
+  lcd.print(myTime[1]);
+  lcd.print("m");
+  lcd.print(myTime[2]);
+  lcd.print("s");
 }
 
-void ParseString(char input[], 
+void parse_startTime()
+{
+  int i = 0;
+  int count = 0;
+  for (int j = 0; j < LOOP_SIZE; j++)
+  {
+     
+    if (i==3)
+    {
+      break;
+    }
+    
+    if (startTime[j] != ':' && startTime[j] != NULL) 
+    {
+      myTime[i][count] = startTime[j];
+      count++;
+    }
+    
+    if ((startTime[j] == ':' || startTime[j] == NULL) && (prev_char != ':' && prev_char != NULL))
+    {
+      i++;
+      count = 0;
+    }
+    
+    prev_char = startTime[j];
+    
+  }
+}
+
+void parse_startDate()
+{
+  int i = 0;
+  int count = 0;
+  for (int j = 0; j < LOOP_SIZE; j++)
+  {
+     
+    if (i==3)
+    {
+      break;
+    }
+    
+    if (startDate[j] != ' ' && startDate[j] != NULL) 
+    {
+      myDate[i][count] = startDate[j];
+      count++;
+    }
+    
+    if ((startDate[j] == ' ' || startDate[j] == NULL) && (prev_char != ' ' && prev_char != NULL))
+    {
+      i++;
+      count = 0;
+    }
+    
+    prev_char = startDate[j];
+    
+  }
+}
