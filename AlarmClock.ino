@@ -8,6 +8,16 @@
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
+byte alarmChar[] = {
+  B00100,
+  B01110,
+  B01110,
+  B01110,
+  B11111,
+  B00000,
+  B00100,
+  B00000
+};
 
 char startDate[ARR_SIZE] = __DATE__;
 char startTime[ARR_SIZE] = __TIME__;
@@ -34,9 +44,12 @@ const int minutesPin = 8;
 
 
 void setup() {
-  // set up the LCD's number of columns and rows:
+  
   lcd.begin(16, 2);
+  lcd.createChar(0, alarmChar);
+  
   Serial.begin(9600);
+  
   pinMode(togglePin, INPUT);
   pinMode(hoursPin, INPUT);
   pinMode(minutesPin, INPUT);
@@ -52,7 +65,6 @@ void setup() {
   hours = hoursString.toInt();
   minutes = minutesString.toInt();
   seconds = secondsString.toInt();
-  Serial.println("Done");
 }
 
 
@@ -86,7 +98,6 @@ void loop() {
     if (minutes == 60)
     {
       minutes = 0;
-      hours++;
     }
 
     seconds = 0;
@@ -123,14 +134,17 @@ void loop() {
     lcd.setCursor(0, 1);
     lcd.print("Clock Mode   ");
   }
-
+  
   lcd.setCursor(0, 0);
   lcd.print(String(hours));
   lcd.print("h");
   lcd.print(String(minutes));
   lcd.print("m");
   lcd.print(String(seconds));
-  lcd.print("s        ");
+  lcd.print("s  ");
+  
+  lcd.setCursor(15,0);
+  lcd.write((uint8_t) 0);
 }
 
 
