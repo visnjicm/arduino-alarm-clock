@@ -32,14 +32,23 @@ String secondsString = "";
 int hours = hoursString.toInt();
 int minutes = minutesString.toInt();
 int seconds = secondsString.toInt();
+int alarmHours;
+int alarmMinutes;
 int addSeconds;
 int prev_addSeconds;
 int toggleState = 0;
 int hoursState = 0;
 int minutesState = 0;
+int alarmState = 0;
+int prev_alarmState = 0;
+int alarmSet = 0;
+int alarmTriggered = 0;
+
 const int togglePin = 9;
 const int hoursPin = 6;
 const int minutesPin = 8;
+const int motorPin = 10;
+const int alarmPin = 13;
 
 
 
@@ -53,6 +62,8 @@ void setup() {
   pinMode(togglePin, INPUT);
   pinMode(hoursPin, INPUT);
   pinMode(minutesPin, INPUT);
+  pinMode(alarmPin, INPUT);
+  pinMode(motorPin, OUTPUT);
 
   parse_startDate();
   parse_startTime();
@@ -65,6 +76,9 @@ void setup() {
   hours = hoursString.toInt();
   minutes = minutesString.toInt();
   seconds = secondsString.toInt();
+
+  alarmState = digitalRead(alarmPin);
+  prev_alarmState = alarmState;
 }
 
 
@@ -73,13 +87,11 @@ void loop() {
   toggleState = digitalRead(togglePin);
   hoursState = digitalRead(hoursPin);
   minutesState = digitalRead(minutesPin);
-  
 
-  if (toggleState == LOW)
+  if (toggleState == LOW && alarmTriggered == 0)
   {
     if (hoursState == LOW)
     {
-      Serial.println("HELLO");
       hours++;
       delay(100);  
     }
@@ -101,50 +113,91 @@ void loop() {
     }
 
     seconds = 0;
-    
+
+    alarmState = digitalRead(alarmPin);
+    if (alarmState != prev_alarmState)
+    {
+      if (!alarmSet)
+      {
+        alarmHours = hours;
+        alarmMinutes = minutes;
+        alarmSet = 1;
+      }
+      
+      lcd.setCursor(15,0);
+      lcd.write((uint8_t) 0);
+      prev_alarmState = alarmState;
+    }
+
+    lcd.setCursor(0, 0);
+    lcd.print(String(hours));
+    lcd.print("h");
+    lcd.print(String(minutes));
+    lcd.print("m");
+    lcd.print(String(seconds));
+    lcd.print("s      ");
     lcd.setCursor(0, 1);
-    lcd.print("Set Time Mode   ");
+    lcd.print("Set Alarm/Time     ");
   }
   else 
   {
-    addSeconds = millis()/1000;
-    if (addSeconds != prev_addSeconds)
+    if ((alarmHours == hours) && (alarmMinutes == minutes) && alarmTriggered == 0)
     {
-      seconds ++;
-    }
-    prev_addSeconds = addSeconds;
+      lcd.setCursor(0, 0);
+      lcd.print("ALARM! ALARM!   "); 
+      lcd.setCursor(0, 1);
+      lcd.print("Press alarm but");
+      digitalWrite(motorPin, HIGH);
 
-    if (seconds == 60)
+      alarmState = digitalRead(alarmPin);
+      if (alarmState != prev_alarmState)
+      {
+        alarmTriggered = 1;
+      }
+      prev_alarmState = alarmState;
+    }
+    else 
     {
-      seconds = 0;
-      minutes ++;
-    }
+      alarmTriggered = 0;
+      digitalWrite(motorPin, LOW);
+      addSeconds = millis()/1000;
+      if (addSeconds != prev_addSeconds)
+      {
+        seconds ++;
+      }
+      prev_addSeconds = addSeconds;
 
-    if (minutes == 60)
-    {
-      minutes = 0;
-      hours++;
-    }
+      if (seconds == 60)
+      {
+        seconds = 0;
+        minutes ++;
+      }
 
-    if (hours == 24)
-    {
-      hours = 0;
-    }
+      if (minutes == 60)
+      {
+        minutes = 0;
+        hours++;
+      }
 
-    lcd.setCursor(0, 1);
-    lcd.print("Clock Mode   ");
+      if (hours == 24)
+      {
+        hours = 0;
+      }
+
+      lcd.setCursor(0, 1);
+      lcd.print("Clock          ");
+
+      lcd.setCursor(0, 0);
+      lcd.print(String(hours));
+      lcd.print("h");
+      lcd.print(String(minutes));
+      lcd.print("m");
+      lcd.print(String(seconds));
+      lcd.print("s      ");
+
+      } 
+      prev_alarmState = alarmState;
   }
-  
-  lcd.setCursor(0, 0);
-  lcd.print(String(hours));
-  lcd.print("h");
-  lcd.print(String(minutes));
-  lcd.print("m");
-  lcd.print(String(seconds));
-  lcd.print("s  ");
-  
-  lcd.setCursor(15,0);
-  lcd.write((uint8_t) 0);
 }
 
 
