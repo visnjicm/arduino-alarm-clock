@@ -24,6 +24,12 @@ int minutes = minutesString.toInt();
 int seconds = secondsString.toInt();
 int addSeconds;
 int prev_addSeconds;
+int toggleState = 0;
+int hoursState = 0;
+int minutesState = 0;
+const int togglePin = 9;
+const int hoursPin = 6;
+const int minutesPin = 8;
 
 
 
@@ -31,6 +37,9 @@ void setup() {
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   Serial.begin(9600);
+  pinMode(togglePin, INPUT);
+  pinMode(hoursPin, INPUT);
+  pinMode(minutesPin, INPUT);
 
   parse_startDate();
   parse_startTime();
@@ -49,44 +58,79 @@ void setup() {
 
 
 void loop() {
+  toggleState = digitalRead(togglePin);
+  hoursState = digitalRead(hoursPin);
+  minutesState = digitalRead(minutesPin);
+  
 
-  addSeconds = millis()/1000;
-  if (addSeconds != prev_addSeconds){
-    seconds ++;
-  }
-  prev_addSeconds = addSeconds;
+  if (toggleState == LOW)
+  {
+    if (hoursState == LOW)
+    {
+      Serial.println("HELLO");
+      hours++;
+      delay(100);  
+    }
 
+    if (hours == 24)
+    {
+      hours = 0;
+    }
 
-  if (seconds == 60){
+    if (minutesState == LOW)
+    {
+      minutes++;
+      delay(100);
+    }
+
+    if (minutes == 60)
+    {
+      minutes = 0;
+      hours++;
+    }
+
     seconds = 0;
-    minutes ++;
+    
+    lcd.setCursor(0, 1);
+    lcd.print("Set Time Mode   ");
   }
+  else 
+  {
+    addSeconds = millis()/1000;
+    if (addSeconds != prev_addSeconds)
+    {
+      seconds ++;
+    }
+    prev_addSeconds = addSeconds;
 
-  if (minutes == 60){
-    minutes = 0;
-    hours++;
+    if (seconds == 60)
+    {
+      seconds = 0;
+      minutes ++;
+    }
+
+    if (minutes == 60)
+    {
+      minutes = 0;
+      hours++;
+    }
+
+    if (hours == 24)
+    {
+      hours = 0;
+    }
+
+    lcd.setCursor(0, 1);
+    lcd.print("Clock Mode   ");
   }
-
-  if (hours == 24){
-    hours = 0;
-  }
-
 
   lcd.setCursor(0, 0);
-  lcd.print(myDate[0]);
-  lcd.print(" ");
-  lcd.print(myDate[1]);
-  lcd.print(" ");
-  lcd.print(myDate[2]);
-  lcd.print(" ");
-  lcd.setCursor(0, 1);
-  lcd.print(myTime[0]);
+  lcd.print(String(hours));
   lcd.print("h");
   lcd.print(String(minutes));
   lcd.print("m");
   lcd.print(String(seconds));
-  lcd.print("s ");
-
+  lcd.print("s        ");
 }
 
 
