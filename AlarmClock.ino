@@ -3,6 +3,14 @@
 
 #define ARR_SIZE 15
 #define LOOP_SIZE 20
+#define ARR_ALARM_SIZE 2
+
+#define PRINT_CLOCK 0
+#define SET_CLOCKTIME 1
+#define ADD_ALARMS 2
+#define DELETE_ALARMS 3
+#define ALARM_TRIGGERED 4
+
 
 
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
@@ -18,6 +26,22 @@ byte alarmChar[] = {
   B00100,
   B00000
 };
+
+typedef struct alarm
+{
+  int hours;
+  int minutes;
+  
+} Alarm;
+
+
+Alarm arr_alarm[ARR_ALARM_SIZE] = {};
+int arr_alarmState[ARR_ALARM_SIZE] = {0,0};
+int index_alarmTriggered;
+
+
+int prev_deviceState = NULL;
+int current_deviceState = PRINT_CLOCK; 
 
 char startDate[ARR_SIZE] = __DATE__;
 char startTime[ARR_SIZE] = __TIME__;
@@ -37,6 +61,7 @@ int alarmMinutes;
 int addSeconds;
 int prev_addSeconds;
 int toggleState = 0;
+int prev_toggleState = 0;
 int hoursState = 0;
 int minutesState = 0;
 int alarmState = 0;
@@ -83,6 +108,17 @@ void setup() {
 
   alarmState = digitalRead(alarmPin);
   prev_alarmState = alarmState;
+
+  toggleState = digitalRead(togglePin);
+  prev_toggleState = toggleState;
+
+
+  Alarm alarm;
+  alarm.hours = -1;
+  alarm.minutes = -1;
+  arr_alarm[0] = alarm;
+  arr_alarm[1] = alarm;
+
 }
 
 
@@ -96,51 +132,272 @@ void setup() {
 
 void loop() 
 {
+
   toggleState = digitalRead(togglePin);
-  hoursState = digitalRead(hoursPin);
-  minutesState = digitalRead(minutesPin);
-
-  if (toggleState == LOW)
+  if ((toggleState == LOW) && (toggleState != prev_toggleState) && current_deviceState != ALARM_TRIGGERED)
   {
-    block_setTime();
+    current_deviceState = (current_deviceState + 1)%4;
+    lcd.clear();
+  }
+  prev_toggleState = toggleState;
 
-    lcd.setCursor(0, 0);
-	  lcdprint_clockTime();
+  Clock();
+  
+  switch (current_deviceState)
+  {
+    case PRINT_CLOCK:
+      print_Clock();
+      break;
+
+    case SET_CLOCKTIME:
+      print_setClockTime();
+      break;
+
+    case ADD_ALARMS:
+      //print_AddAlarms();
+      break;
+
+    case DELETE_ALARMS:
+      //print_DeleteAlarms();
+      break;
   }
   
-  else 
+}
+
+
+//SUBROUTINES
+void Clock()
+{
+  addSeconds = millis()/1000;
+  if (addSeconds != prev_addSeconds)
   {
-    block_runClock();
-      
-    lcd.setCursor(0, 0);
-    lcdprint_clockTime();
+    seconds = seconds + 1;
+  }
+  prev_addSeconds = addSeconds;
+
+  if (seconds == 60)
+  {
+    seconds = 0;
+    minutes = minutes + 1;
+  }
+
+  if (minutes == 60)
+  {
+    minutes = 0;
+    hours = hours + 1;
+  }
+
+  if (hours == 24)
+  {
+    hours = 0;
   }
 }
 
 
 
+void setClockTime()
+{ 
+
+  hoursState = digitalRead(hoursPin);
+  minutesState = digitalRead(minutesPin);
+  
+  if (hoursState == LOW)
+    {
+      hours++;
+      delay(100);  
+    }
+
+    if (hours == 24)
+    {
+      hours = 0;
+    }
+
+    if (minutesState == LOW)
+    {
+      minutes++;
+      delay(100);
+    }
+
+    if (minutes == 60)
+    {
+      minutes = 0;
+    }
+
+    seconds = 0;
+}
+
+
+void addAlarms()
+{
+
+  hoursState = digitalRead(hoursPin);
+  minutesState = digitalRead(minutesPin);
+  
+  if (hoursState == LOW)
+    {
+      hours++;
+      delay(100);  
+    }
+
+    if (hours == 24)
+    {
+      hours = 0;
+    }
+
+    if (minutesState == LOW)
+    {
+      minutes++;
+      delay(100);
+    }
+
+    if (minutes == 60)
+    {
+      minutes = 0;
+    }
+
+    seconds = 0;
+
+  
+  alarmState = digitalRead(alarmPin);
+  if ((alarmState == LOW) && (alarmState != prev_alarmState))
+  {
+    Alarm alarm = {hours, minutes};
+
+    for (int i = 0; i<ARR_ALARM_SIZE; i++)
+    {
+      if (arr_alarm[i].hours == -1)
+      {
+        arr_alarm[i].hours = hours;
+        arr_alarm[i].minutes = minutes;
+        break;
+      }
+    }
+  }
+
+  for (int i = 0; i<ARR_ALARM_SIZE; i++)
+  {
+    if (arr_alarm[i].hours != -1)
+    {
+      lcd.setCursor(i+12,0);
+      printlcd_specialChar(0);
+    }
+  }
+
+
+  prev_alarmState = alarmState;
+  
+  
+  lcd.setCursor(0, 0);
+  lcd.print(String(hours));
+  lcd.print("h");
+  lcd.print(String(minutes));
+  lcd.print("m");
+  lcd.print(String(seconds));
+  lcd.print("s  ");
+
+  lcd.setCursor(0,1);
+  lcd.print("Add Alarms");
+}
+
+
+void deleteAlarms()
+{
+  hoursState = digitalRead(hoursPin);
+  minutesState = digitalRead(minutesPin);
+  
+  lcd.setCursor(0,0);
+
+  for (int i = 0; i<ARR_ALARM_SIZE; i++)
+  {
+    lcd.setCursor(0,i);
+    if (arr_alarm[i].hours != -1)
+    {
+      printlcd_specialChar(0);
+      lcd.print(i);
+      lcd.print(":");
+      lcd.print(arr_alarm[i].hours);
+      lcd.print("h");
+      lcd.print(arr_alarm[i].minutes);
+      lcd.print("m");
+      lcd.print("   ");
+    }
+  }
+  
+
+  if (digitalRead(hoursPin) == LOW)
+  {
+    lcd.clear();
+    arr_alarm[0].hours = -1;
+    arr_alarm[0].minutes = -1;
+  }
+  if (digitalRead(minutesPin) == LOW)
+  {
+    lcd.clear();
+    arr_alarm[1].hours = -1;
+    arr_alarm[1].minutes = -1;
+  }
+  
+  //lcd.setCursor(0,1);
+  //lcd.print("Delete Alarms");
+}
+
+/*
+void alarmTriggered()
+{
+  alarmState = digitalRead(alarmPin);
+  if ((alarmState == LOW) && (alarmState != prev_alarmState))
+  {
+    
+  }
+  prev_alarmState = alarmState;
+
+  lcd.setCursor(0,0);
+  lcd.print("ALARM TRIGGERED!");
+  lcd.setCursor(0,1);
+  lcd.print("PRESS ALARM BUTT");
+  
+}
+*/
+
+
+//PRINT FUNCTIONS
+
+void print_Clock()
+{
+  lcd.setCursor(0, 0);
+  lcd.print(String(hours));
+  lcd.print("h");
+  lcd.print(String(minutes));
+  lcd.print("m");
+  lcd.print(String(seconds));
+  lcd.print("s      ");
+
+  lcd.setCursor(0,1);
+  lcd.print("Clock");
+}
+
+void printlcd_specialChar(int index)
+{
+  lcd.write((uint8_t) index);
+}
+
+void print_setClockTime()
+{
+  lcd.setCursor(0, 0);
+  lcd.print(String(hours));
+  lcd.print("h");
+  lcd.print(String(minutes));
+  lcd.print("m");
+  lcd.print(String(seconds));
+  lcd.print("s  ");
+
+  lcd.setCursor(0,1);
+  lcd.print("Set Time");
+}
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//User Functions
+//PRE PROCESSING FUNCTIONS
 void parse_startTime()
 {
   int i = 0;
@@ -197,82 +454,4 @@ void parse_startDate()
     prev_char = startDate[j];
     
   }
-}
-
-void lcdprint_clockTime()
-{
-  lcd.print(String(hours));
-  lcd.print("h");
-  lcd.print(String(minutes));
-  lcd.print("m");
-  lcd.print(String(seconds));
-  lcd.print("s      ");
-}
-
-void lcdprint_alarmTriggered()
-{
-  lcd.setCursor(0, 0);
-  lcd.print("ALARM! ALARM!   "); 
-  lcd.setCursor(0, 1);
-  lcd.print("Press alarm but");
-}
-
-
-void block_runClock()
-{
-  addSeconds = millis()/1000;
-  if (addSeconds != prev_addSeconds)
-  {
-    seconds = seconds + 1;
-  }
-  prev_addSeconds = addSeconds;
-
-  if (seconds == 60)
-  {
-    seconds = 0;
-    minutes = minutes + 1;
-  }
-
-  if (minutes == 60)
-  {
-    minutes = 0;
-    hours = hours + 1;
-  }
-
-  if (hours == 24)
-  {
-    hours = 0;
-  }
-}
-
-void block_setTime()
-{
-  if (hoursState == LOW)
-    {
-      hours++;
-      delay(100);  
-    }
-
-    if (hours == 24)
-    {
-      hours = 0;
-    }
-
-    if (minutesState == LOW)
-    {
-      minutes++;
-      delay(100);
-    }
-
-    if (minutes == 60)
-    {
-      minutes = 0;
-    }
-
-    seconds = 0;
-}
-
-void lcdprint_specialChar(int index)
-{
-  lcd.write((uint8_t) index);
 }
