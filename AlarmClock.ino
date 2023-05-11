@@ -362,16 +362,16 @@ void AddAlarms()
 
   AddAlarmSeconds = 0;
 
-  
   Button0State = digitalRead(Button0Pin);
   if ((Button0State == LOW) && (Button0State != prev_Button0State))
-  {
+  { 
+    Alarm alarm = {AddAlarmHours, AddAlarmMinutes};
     for (int i = 0; i<ARR_ALARM_SIZE; i++)
     {
-      if (arr_Alarm[i].hours == -1)
+      if ((arr_Alarm[i].hours == -1) && (AlarmArrayContains(arr_Alarm, alarm) == 0))
       {
-        arr_Alarm[i].hours = AddAlarmHours;
-        arr_Alarm[i].minutes = AddAlarmMinutes;
+        arr_Alarm[i].hours = alarm.hours;
+        arr_Alarm[i].minutes = alarm.minutes;
         break;
       }
     }
@@ -530,4 +530,16 @@ void parse_startDate()
     prev_char = startDate[j];
     
   }
+}
+
+int AlarmArrayContains(Alarm arr_alarm[], Alarm alarm)
+{
+  for (int i = 0; i < ARR_ALARM_SIZE; i++)
+  {
+    if ((arr_alarm[i].hours == alarm.hours) && (arr_alarm[i].minutes == alarm.minutes))
+    {
+      return 1;
+    }
+  }
+  return 0;
 }
