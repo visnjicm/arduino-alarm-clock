@@ -87,11 +87,13 @@ int SetClockSeconds;
 
 
 
-//
-int AlarmHours;
-int AlarmMinutes;
+//ADD ALARM RELATED VARIABLES//
+int AddAlarmHours;
+int AddAlarmMinutes;
+int AddAlarmSeconds;
 int AlarmSet = 0;
 int AlarmTriggered = 0;
+//ADD ALARM RELATED VARIABLES//
 
 
 //BUTTON VARIABLES//
@@ -185,40 +187,52 @@ void loop()
   prev_Button3State = Button3State;
 
   Clock();
-  PrintLcd();
   
   switch (current_deviceState)
   {
     case PRINT_CLOCK:
       SetClockHours = ClockHours;
       SetClockMinutes = ClockMinutes;
+      lcd.setCursor(0,0);
       ROW0 = String(ClockHours) + "h" + String(ClockMinutes) + "m" + String(ClockSeconds) + "s    ";
-      ROW1 = "Clock";
+      lcd.print(ROW0);
+      lcd.setCursor(0,1);
+      ROW1 = "CLOCK";
+      lcd.print(ROW1);
       break;
 
     case SET_CLOCKTIME:
       SetClockTime();
+      lcd.setCursor(0,0);
       ROW0 = String(SetClockHours) + "h" + String(SetClockMinutes) + "m" + String(SetClockSeconds) + "s    ";
+      lcd.print(ROW0);
       break;
 
     case ADD_ALARMS:
-      //print_AddAlarms();
-      Serial.println("HI BITCH");
-      ROW0 = "                        ";
-      ROW1 = "                        ";
+      AddAlarms();
+      lcd.setCursor(0,0);
+      ROW0 = String(AddAlarmHours) + "h" + String(AddAlarmMinutes) + "m" + String(AddAlarmSeconds) + "s  ";
+      lcd.print(ROW0);
+      lcd.setCursor(0,1);
+      ROW1 = "ADD ALARMS";
+      lcd.print(ROW1);
       break;
 
     case DELETE_ALARMS:
-      //print_DeleteAlarms();
-      ROW0 = "";
-      ROW1 = "";
+      DeleteAlarms();
       break;
   }
   
 }
 
 
-//SUBROUTINES
+
+///////////////////////////////////////////////////////////////////////////
+//  FUNCTIONS                                                            //
+///////////////////////////////////////////////////////////////////////////
+
+
+/////// CLOCK SUBROUTINE ///////
 void Clock()
 {
   ClockCount = millis()/1000;
@@ -244,11 +258,16 @@ void Clock()
   {
     ClockHours = 0;
   }
-
 }
+///////////////////////////////////
 
 
 
+
+
+
+
+/////// SET CLOCK SUBROUTINE ///////
 void SetClockTime()
 { 
   CurrentMillis = millis()/1000;
@@ -280,8 +299,9 @@ void SetClockTime()
 
     SetClockSeconds = 0;
 
-
-    ROW1 = "Set Clock";
+    lcd.setCursor(0,1);
+    ROW1 = "SET CLOCK";
+    lcd.print(ROW1);
    
     Button0State = digitalRead(Button0Pin);
     if (Button0State == LOW && prev_Button0State != Button0State)
@@ -297,16 +317,22 @@ void SetClockTime()
 
     if ((SavedMillis - CurrentMillis) > 0)
     {
+      lcd.setCursor(0,1);
       ROW1 = "Time Set!";
+      lcd.print(ROW1);
     }
     else
     {
       SavedMillis = (millis()/1000);
     }
 }
+////////////////////////////////////
 
-/*
-void addAlarms()
+
+
+
+/////// ADD ALARMS SUBROUTINE ///////
+void AddAlarms()
 {
 
   Button1State = digitalRead(Button1Pin);
@@ -314,42 +340,43 @@ void addAlarms()
   
   if (Button1State == LOW)
   {
-    AlarmHours++;
+    AddAlarmHours++;
     delay(100);  
   }
 
-  if (AlarmHours == 24)
+  if (AddAlarmHours == 24)
   {
-    AlarmHours = 0;
+    AddAlarmHours = 0;
   }
 
   if (Button2State == LOW)
   {
-    AlarmMinutes++;
+    AddAlarmMinutes++;
     delay(100);
   }
 
-  if (AlarmMinutes == 60)
+  if (AddAlarmMinutes == 60)
   {
-    AlarmMinutes = 0;
+    AddAlarmMinutes = 0;
   }
+
+  AddAlarmSeconds = 0;
 
   
   Button0State = digitalRead(Button0Pin);
   if ((Button0State == LOW) && (Button0State != prev_Button0State))
   {
-    Alarm alarm = {AlarmHours, minutes};
-
     for (int i = 0; i<ARR_ALARM_SIZE; i++)
     {
       if (arr_Alarm[i].hours == -1)
       {
-        arr_Alarm[i].hours = hours;
-        arr_Alarm[i].minutes = minutes;
+        arr_Alarm[i].hours = AddAlarmHours;
+        arr_Alarm[i].minutes = AddAlarmMinutes;
         break;
       }
     }
   }
+  prev_Button0State = Button0State;
 
   for (int i = 0; i<ARR_ALARM_SIZE; i++)
   {
@@ -359,46 +386,49 @@ void addAlarms()
       printlcd_specialChar(0);
     }
   }
-
-
-  prev_Button0State = Button0State;
   
-  
-  lcd.setCursor(0, 0);
-  lcd.print(String(AlarmHours));
-  lcd.print("h");
-  lcd.print(String(AlarmMinutes));
-  lcd.print("m");
-
-  lcd.setCursor(0,1);
-  lcd.print("Add Alarms");
 }
+////////////////////////////////////////
 
 
-void deleteAlarms()
+
+/////// DELETE ALARMS SUBROUTINE ///////
+void DeleteAlarms()
 {
   Button1State = digitalRead(Button1Pin);
   Button2State = digitalRead(Button2Pin);
-  
-  lcd.setCursor(0,0);
 
-  for (int i = 0; i<ARR_ALARM_SIZE; i++)
+  
+  if (arr_Alarm[0].hours != -1)
   {
-    lcd.setCursor(0,i);
-    if (arr_Alarm[i].hours != -1)
-    {
-      printlcd_specialChar(0);
-      lcd.print(i);
-      lcd.print(":");
-      lcd.print(arr_Alarm[i].hours);
-      lcd.print("h");
-      lcd.print(arr_Alarm[i].minutes);
-      lcd.print("m");
-      lcd.print("   ");
-    }
+    lcd.setCursor(0,0);
+    printlcd_specialChar(0);
+    lcd.setCursor(1,0);
+    ROW0 = String(1) + ":" + String(arr_Alarm[0].hours) + "h" + String(arr_Alarm[0].minutes) + "m" + "     ";
+    lcd.print(ROW0);
   }
-  
 
+  if (arr_Alarm[1].hours != -1)
+  {
+    lcd.setCursor(0,1);
+    printlcd_specialChar(0);
+    lcd.setCursor(1,1);
+    ROW1 = String(2) + ":" + String(arr_Alarm[1].hours) + "h" + String(arr_Alarm[1].minutes) + "m" + "     ";
+    lcd.print(ROW1);
+  }
+
+
+  if ((arr_Alarm[0].hours == -1) && (arr_Alarm[1].hours == -1))
+  {
+    lcd.setCursor(0,0);
+    ROW0 = "NO ALARMS SET";
+    lcd.print(ROW0);
+    lcd.setCursor(0,1);
+    ROW1 = "                            ";
+    lcd.print(ROW1);
+  }
+
+  
   if (digitalRead(Button1Pin) == LOW)
   {
     lcd.clear();
@@ -411,10 +441,9 @@ void deleteAlarms()
     arr_Alarm[1].hours = -1;
     arr_Alarm[1].minutes = -1;
   }
-  
-  //lcd.setCursor(0,1);
-  //lcd.print("Delete Alarms");
+
 }
+////////////////////////////////////////
 
 /*
 void alarmTriggered()
@@ -438,32 +467,10 @@ void alarmTriggered()
 //PRINT FUNCTIONS
 
 
-void PrintLcd()
-{
-  lcd.setCursor(0,0);
-  lcd.print(ROW0);
-  lcd.setCursor(0,1);
-  lcd.print(ROW1);
-}
-
 void printlcd_specialChar(int index)
 {
   lcd.write((uint8_t) index);
 }
-
-void print_SetClockTime()
-{
-  lcd.setCursor(0, 0);
-  lcd.print(String(SetClockHours));
-  lcd.print("h");
-  lcd.print(String(SetClockMinutes));
-  lcd.print("m");
-  lcd.print(String(SetClockSeconds));
-  lcd.print("s  ");
-  lcd.setCursor(0,1);
-  lcd.print("Set Time");
-}
-
 
 
 //PRE PROCESSING FUNCTIONS
