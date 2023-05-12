@@ -93,9 +93,9 @@ int AddAlarmMinutes;
 int AddAlarmSeconds;
 int AlarmSet = 0;
 int AlarmTriggered = 0;
-int AlarmTriggeredHours;
-int AlarmTriggeredMinutes;
-int TurnAlarmOff = 0;
+int AlarmTriggeredHours = -1;
+int AlarmTriggeredMinutes = -1;
+int AlarmOn = -1;
 //ADD ALARM RELATED VARIABLES//
 
 
@@ -107,7 +107,6 @@ int Button2State = 1;
 int Button3State = 1;
 int prev_Button3State = 1;
 //BUTTON VARIABLES//
-
 
 
 //PINS VARIABLES//
@@ -183,8 +182,9 @@ void loop()
 
   Clock();
 
-  if (AlarmTriggered == 0 || ((TurnAlarmOff) == 1))
+  if (AlarmOn == 0 || AlarmOn == -1)
   {
+    digitalWrite(MotorPin, LOW);
   Button3State = digitalRead(Button3Pin);
   if ((Button3State == LOW) && (Button3State != prev_Button3State) && current_deviceState != ALARM_TRIGGERED)
   {
@@ -230,6 +230,8 @@ void loop()
   }
   else
   {
+    AlarmTriggered = 1;
+    digitalWrite(MotorPin, HIGH);
     lcd.setCursor(0,0);
     ROW0 = "ALARM TRIGGERED!!!";
     lcd.print(ROW0);
@@ -241,33 +243,27 @@ void loop()
     if ((Button0State == LOW) && (Button0State != prev_Button0State))
     {
       lcd.clear();
-      TurnAlarmOff = 1;
+      AlarmOn = 0;
     }
     prev_Button0State = Button0State;
 
   }
 
-  if ((TurnAlarmOff == 1) && ((ClockMinutes != AlarmTriggeredMinutes) || (ClockHours != AlarmTriggeredHours)))
+  if ((AlarmOn == 0) && ((ClockMinutes != AlarmTriggeredMinutes) || (ClockHours != AlarmTriggeredHours)) && (AlarmTriggeredMinutes != -1) && (AlarmTriggeredHours != -1))
   {
-    TurnAlarmOff = 0;
+    AlarmTriggered = 0;
   }    
 
-  if (TurnAlarmOff == 0)
-  {
   for (int i = 0; i < ARR_ALARM_SIZE; i++)
   {
-    if ((ClockHours == arr_Alarm[i].hours) && (ClockMinutes == arr_Alarm[i].minutes))
+    if ((ClockHours == arr_Alarm[i].hours) && (ClockMinutes == arr_Alarm[i].minutes) && (AlarmTriggered != 1))
     {
       AlarmTriggered = 1;
+      AlarmOn = 1;
       AlarmTriggeredHours = arr_Alarm[i].hours;
       AlarmTriggeredMinutes = arr_Alarm[i].minutes;
       break;
     }
-    else
-    {
-      AlarmTriggered = 0;
-    }
-  }
   }
   
 }
