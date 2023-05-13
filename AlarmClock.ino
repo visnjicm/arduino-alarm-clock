@@ -9,7 +9,7 @@
 #define DELETE_ALARMS 3
 #define ALARM_TRIGGERED 4
 
-const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+const int rs = 2, en = 3, d4 = 4, d5 = 5, d6 = 6, d7 = 7;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 const byte AlarmChar[] = {
   B00100,
@@ -30,40 +30,40 @@ typedef struct alarm
 Alarm arr_Alarm[ARR_ALARM_SIZE] = {};
 
 
-volatile int DeviceState = PRINT_CLOCK; 
-volatile char myTime[3][ARR_SIZE];
-volatile char prev_char;
-volatile String hoursString = "";
-volatile String minutesString = "";
-volatile String secondsString = "";
-volatile int ClockHours = hoursString.toInt();
-volatile int ClockMinutes = minutesString.toInt();
-volatile int ClockSeconds = secondsString.toInt();
-volatile int ClockCount;
-volatile int prev_ClockCount;
-volatile int SetClockHours;
-volatile int SetClockMinutes;
-volatile int AddAlarmHours;
-volatile int AddAlarmMinutes;
-volatile int AddAlarmSeconds;
-volatile int AlarmTriggered = 0;
-volatile int AlarmTriggeredHours = -1;
-volatile int AlarmTriggeredMinutes = -1;
-volatile int AlarmOn = -1;
+int DeviceState = PRINT_CLOCK; 
+char myTime[3][ARR_SIZE];
+char prev_char;
+String hoursString = "";
+String minutesString = "";
+String secondsString = "";
+int ClockHours = hoursString.toInt();
+int ClockMinutes = minutesString.toInt();
+int ClockSeconds = secondsString.toInt();
+int ClockCount;
+int prev_ClockCount;
+int SetClockHours;
+int SetClockMinutes;
+int AddAlarmHours;
+int AddAlarmMinutes;
+int AddAlarmSeconds;
+int AlarmTriggered = 0;
+int AlarmTriggeredHours = -1;
+int AlarmTriggeredMinutes = -1;
+int AlarmOn = -1;
 volatile int Button0State = 1;
-volatile int prev_Button0State = 1;
+int prev_Button0State = 1;
 volatile int Button1State = 1;
 volatile int Button2State = 1;
 volatile int Button3State = 1;
-volatile int prev_Button3State = 1;
-volatile int SavedMillis = -1;
-volatile int CurrentMillis = millis()/1000;
+int prev_Button3State = 1;
+int SavedMillis = -1;
+int CurrentMillis = millis()/1000;
 
-const int Button3Pin = 9;
-const int Button1Pin = 6;
-const int Button2Pin = 8;
-const int MotorPin = 10;
-const int Button0Pin = 13;
+const int Button3Pin = 13;
+const int Button1Pin = 11;
+const int Button2Pin = 12;
+const int MotorPin = 9;
+const int Button0Pin = 10;
 const int SetClockSeconds = 0;
 const char startTime[ARR_SIZE] = __TIME__;
 
