@@ -31,6 +31,7 @@ Alarm arr_Alarm[ARR_ALARM_SIZE] = {};
 
 
 int DeviceState = PRINT_CLOCK; 
+int prev_DeviceState;
 char myTime[3][ARR_SIZE];
 char prev_char;
 String hoursString = "";
@@ -308,7 +309,6 @@ int AlarmArrayContains(Alarm arr_alarm[], Alarm alarm)
   return 0;
 }
 
-
 void setup() 
 {
   lcd.begin(16, 2);
@@ -341,6 +341,12 @@ void setup()
   //INIT CUSTOM LCD CHAR
   lcd.createChar(0, AlarmChar);  
 
+  //Enable Interrupt Port B
+  PCICR |= B00000001;
+
+  //Enable Interrupt Mask for Pin D13 to D10
+  PCMSK0 |= B00111100;
+
 }
 
 void loop() 
@@ -350,7 +356,7 @@ void loop()
 
   if (AlarmOn == 0 || AlarmOn == -1)
   {
-    digitalWrite(MotorPin, LOW);
+    //digitalWrite(MotorPin, LOW);
     Button3State = digitalRead(Button3Pin);
     if ((Button3State == LOW) && (Button3State != prev_Button3State) && DeviceState != ALARM_TRIGGERED)
     {
@@ -392,11 +398,13 @@ void loop()
       case DELETE_ALARMS:
         DeleteAlarms();
         break;
+
     }
   }
   
   else
   {
+    DeviceState = ALARM_TRIGGERED;
     AlarmTriggered = 1;
     digitalWrite(MotorPin, HIGH);
     lcd.setCursor(0,0);
@@ -411,6 +419,7 @@ void loop()
     {
       lcd.clear();
       AlarmOn = 0;
+      DeviceState = prev_DeviceState;
     }
     prev_Button0State = Button0State;
 
@@ -429,8 +438,32 @@ void loop()
       AlarmOn = 1;
       AlarmTriggeredHours = arr_Alarm[i].hours;
       AlarmTriggeredMinutes = arr_Alarm[i].minutes;
+      prev_DeviceState = DeviceState;
       break;
     }
   }
-  
+}
+
+
+ISR (PCINT0_vect)
+{
+  if (digitalRead(Button3Pin) == LOW)
+  {
+    Serial.println("Button3");
+  }
+
+  if (digitalRead(Button2Pin) == LOW)
+  {
+    Serial.println("Button2");
+  }
+
+  if (digitalRead(Button1Pin) == LOW)
+  {
+    Serial.println("Button1");
+  }
+
+  if (digitalRead(Button0Pin) == LOW)
+  {
+    Serial.println("Button0");
+  }
 }
