@@ -73,149 +73,6 @@ int SavedMillis = -1;
 int CurrentMillis = millis()/1000;
 
 
-void setup() {
-  
-  lcd.begin(16, 2);
-  Serial.begin(9600);
-  pinMode(Button3Pin, INPUT);
-  pinMode(Button1Pin, INPUT);
-  pinMode(Button2Pin, INPUT);
-  pinMode(Button0Pin, INPUT);
-  pinMode(MotorPin, OUTPUT);
-  parse_startDate();
-  parse_startTime();
-  hoursString.concat(myTime[0][0]);
-  hoursString.concat(myTime[0][1]);
-  minutesString.concat(myTime[1][0]);
-  minutesString.concat(myTime[1][1]);
-  secondsString.concat(myTime[2][0]);
-  secondsString.concat(myTime[2][1]);
-  ClockHours = hoursString.toInt();
-  ClockMinutes = minutesString.toInt();
-  ClockSeconds = secondsString.toInt();
-  Button0State = digitalRead(Button0Pin);
-  prev_Button0State = Button0State;
-  Button3State = digitalRead(Button3Pin);
-  prev_Button3State = Button3State;
-  Alarm alarm;
-  alarm.hours = -1;
-  alarm.minutes = -1;
-  arr_Alarm[0] = alarm;
-  arr_Alarm[1] = alarm;
-
-  //INIT CUSTOM LCD CHAR
-  lcd.createChar(0, AlarmChar);  
-
-}
-
-
-
-
-
-
-
-
-
-
-void loop() 
-{
-
-  Clock();
-
-  if (AlarmOn == 0 || AlarmOn == -1)
-  {
-    digitalWrite(MotorPin, LOW);
-  Button3State = digitalRead(Button3Pin);
-  if ((Button3State == LOW) && (Button3State != prev_Button3State) && DeviceState != ALARM_TRIGGERED)
-  {
-    DeviceState = (DeviceState + 1)%4;
-    lcd.clear();
-  }
-  prev_Button3State = Button3State;
-  
-  switch (DeviceState)
-  {
-    case PRINT_CLOCK:
-      SetClockHours = ClockHours;
-      SetClockMinutes = ClockMinutes;
-      lcd.setCursor(0,0);
-      ROW0 = String(ClockHours) + "h" + String(ClockMinutes) + "m" + String(ClockSeconds) + "s    ";
-      lcd.print(ROW0);
-      lcd.setCursor(0,1);
-      ROW1 = "CLOCK";
-      lcd.print(ROW1);
-      break;
-
-    case SET_CLOCKTIME:
-      SetClockTime();
-      lcd.setCursor(0,0);
-      ROW0 = String(SetClockHours) + "h" + String(SetClockMinutes) + "m" + String(SetClockSeconds) + "s    ";
-      lcd.print(ROW0);
-      break;
-
-    case ADD_ALARMS:
-      AddAlarms();
-      lcd.setCursor(0,0);
-      ROW0 = String(AddAlarmHours) + "h" + String(AddAlarmMinutes) + "m" + String(AddAlarmSeconds) + "s  ";
-      lcd.print(ROW0);
-      lcd.setCursor(0,1);
-      ROW1 = "ADD ALARMS";
-      lcd.print(ROW1);
-      break;
-
-    case DELETE_ALARMS:
-      DeleteAlarms();
-      break;
-  }
-  }
-  else
-  {
-    AlarmTriggered = 1;
-    digitalWrite(MotorPin, HIGH);
-    lcd.setCursor(0,0);
-    ROW0 = "ALARM TRIGGERED!!!";
-    lcd.print(ROW0);
-    lcd.setCursor(0,1);
-    ROW1 = "PRESS BUTTON0";
-    lcd.print(ROW1);
-    
-    Button0State = digitalRead(Button0Pin);
-    if ((Button0State == LOW) && (Button0State != prev_Button0State))
-    {
-      lcd.clear();
-      AlarmOn = 0;
-    }
-    prev_Button0State = Button0State;
-
-  }
-
-  if ((AlarmOn == 0) && ((ClockMinutes != AlarmTriggeredMinutes) || (ClockHours != AlarmTriggeredHours)) && (AlarmTriggeredMinutes != -1) && (AlarmTriggeredHours != -1))
-  {
-    AlarmTriggered = 0;
-  }    
-
-  for (int i = 0; i < ARR_ALARM_SIZE; i++)
-  {
-    if ((ClockHours == arr_Alarm[i].hours) && (ClockMinutes == arr_Alarm[i].minutes) && (AlarmTriggered != 1))
-    {
-      AlarmTriggered = 1;
-      AlarmOn = 1;
-      AlarmTriggeredHours = arr_Alarm[i].hours;
-      AlarmTriggeredMinutes = arr_Alarm[i].minutes;
-      break;
-    }
-  }
-  
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////
-//  FUNCTIONS                                                            //
-///////////////////////////////////////////////////////////////////////////
-
-
-/////// CLOCK SUBROUTINE ///////
 void Clock()
 {
   ClockCount = millis()/1000;
@@ -242,15 +99,7 @@ void Clock()
     ClockHours = 0;
   }
 }
-///////////////////////////////////
 
-
-
-
-
-
-
-/////// SET CLOCK SUBROUTINE ///////
 void SetClockTime()
 { 
   CurrentMillis = millis()/1000;
@@ -309,12 +158,7 @@ void SetClockTime()
       SavedMillis = (millis()/1000);
     }
 }
-////////////////////////////////////
 
-
-
-
-/////// ADD ALARMS SUBROUTINE ///////
 void AddAlarms()
 {
 
@@ -371,11 +215,7 @@ void AddAlarms()
   }
   
 }
-////////////////////////////////////////
 
-
-
-/////// DELETE ALARMS SUBROUTINE ///////
 void DeleteAlarms()
 {
   Button1State = digitalRead(Button1Pin);
@@ -426,37 +266,12 @@ void DeleteAlarms()
   }
 
 }
-////////////////////////////////////////
-
-/*
-void alarmTriggered()
-{
-  Button0State = digitalRead(Button0Pin);
-  if ((Button0State == LOW) && (Button0State != prev_Button0State))
-  {
-    
-  }
-  prev_Button0State = Button0State;
-
-  lcd.setCursor(0,0);
-  lcd.print("ALARM TRIGGERED!");
-  lcd.setCursor(0,1);
-  lcd.print("PRESS ALARM BUTT");
-  
-}
-*/
-
-
-//PRINT FUNCTIONS
-
 
 void printlcd_specialChar(int index)
 {
   lcd.write((uint8_t) index);
 }
 
-
-//PRE PROCESSING FUNCTIONS
 void parse_startTime()
 {
   int i = 0;
@@ -486,35 +301,6 @@ void parse_startTime()
   }
 }
 
-void parse_startDate()
-{
-  int i = 0;
-  int count = 0;
-  for (int j = 0; j < LOOP_SIZE; j++)
-  {
-     
-    if (i==3)
-    {
-      break;
-    }
-    
-    if (startDate[j] != ' ' && startDate[j] != NULL) 
-    {
-      myDate[i][count] = startDate[j];
-      count++;
-    }
-    
-    if ((startDate[j] == ' ' || startDate[j] == NULL) && (prev_char != ' ' && prev_char != NULL))
-    {
-      i++;
-      count = 0;
-    }
-    
-    prev_char = startDate[j];
-    
-  }
-}
-
 int AlarmArrayContains(Alarm arr_alarm[], Alarm alarm)
 {
   for (int i = 0; i < ARR_ALARM_SIZE; i++)
@@ -525,4 +311,131 @@ int AlarmArrayContains(Alarm arr_alarm[], Alarm alarm)
     }
   }
   return 0;
+}
+
+
+void setup() 
+{
+  lcd.begin(16, 2);
+  Serial.begin(9600);
+  pinMode(Button3Pin, INPUT);
+  pinMode(Button1Pin, INPUT);
+  pinMode(Button2Pin, INPUT);
+  pinMode(Button0Pin, INPUT);
+  pinMode(MotorPin, OUTPUT);
+  parse_startTime();
+  hoursString.concat(myTime[0][0]);
+  hoursString.concat(myTime[0][1]);
+  minutesString.concat(myTime[1][0]);
+  minutesString.concat(myTime[1][1]);
+  secondsString.concat(myTime[2][0]);
+  secondsString.concat(myTime[2][1]);
+  ClockHours = hoursString.toInt();
+  ClockMinutes = minutesString.toInt();
+  ClockSeconds = secondsString.toInt();
+  Button0State = digitalRead(Button0Pin);
+  prev_Button0State = Button0State;
+  Button3State = digitalRead(Button3Pin);
+  prev_Button3State = Button3State;
+  Alarm alarm;
+  alarm.hours = -1;
+  alarm.minutes = -1;
+  arr_Alarm[0] = alarm;
+  arr_Alarm[1] = alarm;
+
+  //INIT CUSTOM LCD CHAR
+  lcd.createChar(0, AlarmChar);  
+
+}
+
+void loop() 
+{
+
+  Clock();
+
+  if (AlarmOn == 0 || AlarmOn == -1)
+  {
+    digitalWrite(MotorPin, LOW);
+    Button3State = digitalRead(Button3Pin);
+    if ((Button3State == LOW) && (Button3State != prev_Button3State) && DeviceState != ALARM_TRIGGERED)
+    {
+      DeviceState = (DeviceState + 1)%4;
+      lcd.clear();
+    }
+    prev_Button3State = Button3State;
+  
+    switch (DeviceState)
+    {
+      case PRINT_CLOCK:
+        SetClockHours = ClockHours;
+        SetClockMinutes = ClockMinutes;
+        lcd.setCursor(0,0);
+        ROW0 = String(ClockHours) + "h" + String(ClockMinutes) + "m" + String(ClockSeconds) + "s    ";
+        lcd.print(ROW0);
+        lcd.setCursor(0,1);
+        ROW1 = "CLOCK";
+        lcd.print(ROW1);
+        break;
+
+      case SET_CLOCKTIME:
+        SetClockTime();
+        lcd.setCursor(0,0);
+        ROW0 = String(SetClockHours) + "h" + String(SetClockMinutes) + "m" + String(SetClockSeconds) + "s    ";
+        lcd.print(ROW0);
+        break;
+
+      case ADD_ALARMS:
+        AddAlarms();
+        lcd.setCursor(0,0);
+        ROW0 = String(AddAlarmHours) + "h" + String(AddAlarmMinutes) + "m" + String(AddAlarmSeconds) + "s  ";
+        lcd.print(ROW0);
+        lcd.setCursor(0,1);
+        ROW1 = "ADD ALARMS";
+        lcd.print(ROW1);
+        break;
+
+      case DELETE_ALARMS:
+        DeleteAlarms();
+        break;
+    }
+  }
+  
+  else
+  {
+    AlarmTriggered = 1;
+    digitalWrite(MotorPin, HIGH);
+    lcd.setCursor(0,0);
+    ROW0 = "ALARM TRIGGERED!!!";
+    lcd.print(ROW0);
+    lcd.setCursor(0,1);
+    ROW1 = "PRESS BUTTON0";
+    lcd.print(ROW1);
+    
+    Button0State = digitalRead(Button0Pin);
+    if ((Button0State == LOW) && (Button0State != prev_Button0State))
+    {
+      lcd.clear();
+      AlarmOn = 0;
+    }
+    prev_Button0State = Button0State;
+
+  }
+
+  if ((AlarmOn == 0) && ((ClockMinutes != AlarmTriggeredMinutes) || (ClockHours != AlarmTriggeredHours)) && (AlarmTriggeredMinutes != -1) && (AlarmTriggeredHours != -1))
+  {
+    AlarmTriggered = 0;
+  }    
+
+  for (int i = 0; i < ARR_ALARM_SIZE; i++)
+  {
+    if ((ClockHours == arr_Alarm[i].hours) && (ClockMinutes == arr_Alarm[i].minutes) && (AlarmTriggered != 1))
+    {
+      AlarmTriggered = 1;
+      AlarmOn = 1;
+      AlarmTriggeredHours = arr_Alarm[i].hours;
+      AlarmTriggeredMinutes = arr_Alarm[i].minutes;
+      break;
+    }
+  }
+  
 }
