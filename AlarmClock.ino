@@ -1,24 +1,27 @@
-//INITIALIZATIONS//
+/////////// INITIALIZATIONS //////////////////
 #include <TimeLib.h>
 #include <LiquidCrystal.h>
+/////////// INITIALIZATIONS //////////////////
 
+/////////// MACROS //////////////////
 #define ARR_SIZE 15
 #define LOOP_SIZE 20
 #define ARR_ALARM_SIZE 2
-
 #define PRINT_CLOCK 0
 #define SET_CLOCKTIME 1
 #define ADD_ALARMS 2
 #define DELETE_ALARMS 3
 #define ALARM_TRIGGERED 4
+/////////// MACROS //////////////////
 
+/////////// LCD INIT //////////////////
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
-//INITIALIZATIONS//
+/////////// LCD INIT //////////////////
 
 
 
-//CUSTOM LCD CHAR VARIABLES//
+/////////// CUSTOM LCD CHARS //////////////////
 byte AlarmChar[] = {
   B00100,
   B01110,
@@ -29,7 +32,7 @@ byte AlarmChar[] = {
   B00100,
   B00000
 };
-//CUSTOM LCD CHAR VARIABLES//
+/////////// CUSTOM LCD CHARS //////////////////
 
 
 
