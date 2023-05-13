@@ -11,7 +11,7 @@
 
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
-byte AlarmChar[] = {
+const byte AlarmChar[] = {
   B00100,
   B01110,
   B01110,
@@ -29,49 +29,46 @@ typedef struct alarm
 } Alarm;
 Alarm arr_Alarm[ARR_ALARM_SIZE] = {};
 
-int arr_Button0State[ARR_ALARM_SIZE] = {0,0};
-int index_AlarmTriggered;
-int DeviceState = PRINT_CLOCK; 
-char startDate[ARR_SIZE] = __DATE__;
-char startTime[ARR_SIZE] = __TIME__;
-char myDate[3][ARR_SIZE];
-char myTime[3][ARR_SIZE];
-char prev_char;
-String hoursString = "";
-String minutesString = "";
-String secondsString = "";
-int ClockHours = hoursString.toInt();
-int ClockMinutes = minutesString.toInt();
-int ClockSeconds = secondsString.toInt();
-int ClockCount;
-int prev_ClockCount;
-int SetClockHours;
-int SetClockMinutes;
-int SetClockSeconds;
-int AddAlarmHours;
-int AddAlarmMinutes;
-int AddAlarmSeconds;
-int AlarmSet = 0;
-int AlarmTriggered = 0;
-int AlarmTriggeredHours = -1;
-int AlarmTriggeredMinutes = -1;
-int AlarmOn = -1;
-int Button0State = 1;
-int prev_Button0State = 1;
-int Button1State = 1;
-int Button2State = 1;
-int Button3State = 1;
-int prev_Button3State = 1;
+
+volatile int DeviceState = PRINT_CLOCK; 
+volatile char myTime[3][ARR_SIZE];
+volatile char prev_char;
+volatile String hoursString = "";
+volatile String minutesString = "";
+volatile String secondsString = "";
+volatile int ClockHours = hoursString.toInt();
+volatile int ClockMinutes = minutesString.toInt();
+volatile int ClockSeconds = secondsString.toInt();
+volatile int ClockCount;
+volatile int prev_ClockCount;
+volatile int SetClockHours;
+volatile int SetClockMinutes;
+volatile int AddAlarmHours;
+volatile int AddAlarmMinutes;
+volatile int AddAlarmSeconds;
+volatile int AlarmTriggered = 0;
+volatile int AlarmTriggeredHours = -1;
+volatile int AlarmTriggeredMinutes = -1;
+volatile int AlarmOn = -1;
+volatile int Button0State = 1;
+volatile int prev_Button0State = 1;
+volatile int Button1State = 1;
+volatile int Button2State = 1;
+volatile int Button3State = 1;
+volatile int prev_Button3State = 1;
+volatile int SavedMillis = -1;
+volatile int CurrentMillis = millis()/1000;
+
 const int Button3Pin = 9;
 const int Button1Pin = 6;
 const int Button2Pin = 8;
 const int MotorPin = 10;
 const int Button0Pin = 13;
+const int SetClockSeconds = 0;
+const char startTime[ARR_SIZE] = __TIME__;
+
 String ROW0 = "";
 String ROW1 = "";
-int SavedMillis = -1;
-int CurrentMillis = millis()/1000;
-
 
 void Clock()
 {
@@ -128,8 +125,6 @@ void SetClockTime()
     {
       SetClockMinutes = 0;
     }
-
-    SetClockSeconds = 0;
 
     lcd.setCursor(0,1);
     ROW1 = "SET CLOCK";
