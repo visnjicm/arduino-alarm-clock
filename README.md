@@ -6,7 +6,7 @@ Pushbutton (from left to right):
 - Click to set time or set alarm, when on the set alarm or set clock screen.
 - Click to toggle hour, when on the set alarm or set clock screen. Or to delete alarm, when on the alarm check screen.
 - Click to togggle minute, when on the set alarm or set clock screen.
-- Click to toggle screen/mode, between four different modes. Start at clock mode, then set clock mode, then add alarm mode, and then check/delete alarm mode, and then back to clock mode.
+- Click to toggle screen/mode, between four different modes. Start at clock mode, then set clock mode, then add alarm mode, and then check/delete alarm mode, and then back to clock mode. Also click when alarm is triggered to turn it off.
 
 ![DSC_0000001](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/f864e8d4-5cb3-41eb-b662-547d15b48f37)
 
