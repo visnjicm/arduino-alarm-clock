@@ -1,5 +1,6 @@
 # arduino-digital-alarm-clock
-![Untitled Sketch_bb](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/180d9295-7432-49b9-831c-bed49820a357)
+![image](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/ec60e6d2-c860-49ff-9e42-99e0840c2643)
+
 
 Things to add/change:
 1. Volume control
