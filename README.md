@@ -8,19 +8,17 @@ Pushbutton (from left to right):
 - Click to togggle minute, when on the set alarm or set clock screen.
 - Click to toggle screen/mode, between four different modes. Start at clock mode, then set clock mode, then add alarm mode, and then check/delete alarm mode, and then back to clock mode.
 
-![image](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/ec60e6d2-c860-49ff-9e42-99e0840c2643)
+![DSC_0000001](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/f864e8d4-5cb3-41eb-b662-547d15b48f37)
 
-![DSC_0000001](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/90e81d00-1c2f-49a1-99d2-99f395202b7e)
+![DSC_0000002](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/7d82dca4-2e66-4f7b-960e-0721295d4c97)
 
-![DSC_0000002](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/d87ff93c-7618-4450-81fd-afe73c9f29d0)
+![DSC_0000003](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/11f733c1-c135-4757-99e2-3bc5f6020c2f)
 
-![DSC_0000003](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/5bd324d5-589b-4a7d-ac06-9014f0de6451)
+![DSC_0000004](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/b7dd3a23-9e8e-4dbb-9dc1-026c35408cea)
 
-![DSC_0000004](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/c83a6f80-bf2a-4f1e-8fc1-5976129f6174)
+![DSC_0000005](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/f6e4f27b-cc0a-4289-94e6-5cd639b60b50)
 
-![DSC_0000005](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/2e1966e9-1cf0-417a-aa5f-9ab95a2696a7)
-
-![DSC_0000006](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/b5013d0c-e167-4bec-a8c9-cb2c3a530c29)
+![DSC_0000006](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/9a025cb7-2157-45a6-b780-99c5a13402a8)
 
 
 Things to add/change:
