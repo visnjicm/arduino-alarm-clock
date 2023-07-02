@@ -20,6 +20,9 @@ Pushbutton (from left to right):
 
 ![DSC_0000006](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/9a025cb7-2157-45a6-b780-99c5a13402a8)
 
+![image](https://github.com/visnjicm/arduino-digital-alarm-clock/assets/126916558/7c794508-22cc-48b5-9868-d01a2a961744)
+
+
 
 Things to add/change:
 1. Volume control
